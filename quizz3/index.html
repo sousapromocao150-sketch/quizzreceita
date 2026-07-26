@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ciclo Fértil — Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;1,9..144,450&family=Work+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF6EF;
+    --plum:#3D2A3D;
+    --plum-soft:#5B3F58;
+    --berry:#C24D6E;
+    --sage:#7C8C56;
+    --gold:#D2A23F;
+    --line:rgba(61,42,61,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--plum);
+    font-family:'Work Sans', sans-serif;
+    font-weight:400;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    font-weight:450;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  a{color:inherit;}
+
+  .top{
+    display:flex;
+    justify-content:center;
+    padding:28px 24px 0;
+  }
+  .eyebrow{
+    font-family:'Space Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--berry);
+    display:flex;
+    align-items:center;
+    gap:0.6em;
+  }
+  .eyebrow::before, .eyebrow::after{
+    content:"";
+    width:16px;height:1px;
+    background:var(--berry);
+    display:inline-block;
+  }
+
+  main{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+
+  .btn{
+    font-family:'Space Mono', monospace;
+    font-size:0.82rem;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    border:none;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    padding:16px 26px;
+    border-radius:2px;
+    transition:transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .btn-primary{
+    background:var(--plum);
+    color:var(--cream);
+  }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 10px 24px -8px rgba(61,42,61,0.5); }
+  .btn-primary:focus-visible, .choice:focus-visible, .btn-ghost:focus-visible{
+    outline:2px solid var(--berry);
+    outline-offset:3px;
+  }
+  .btn-ghost{
+    background:transparent;
+    color:var(--plum);
+    border:1px solid var(--line);
+  }
+  .btn-ghost:hover{ background:rgba(61,42,61,0.05); }
+
+  /* ---------- QUIZ ---------- */
+  .quiz-shell{
+    width:100%;
+    max-width:560px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:44px 40px;
+    position:relative;
+  }
+  .quiz-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-bottom:30px;
+    gap:20px;
+  }
+  .progress-ring{ width:60px; height:60px; flex-shrink:0; }
+  .progress-ring circle.track{ fill:none; stroke:var(--line); stroke-width:3; }
+  .progress-ring circle.fill{
+    fill:none; stroke:var(--berry); stroke-width:3; stroke-linecap:round;
+    transform:rotate(-90deg); transform-origin:50% 50%;
+    transition:stroke-dashoffset 0.5s ease;
+  }
+  .progress-num{
+    font-family:'Space Mono', monospace;
+    font-size:0.66rem;
+    fill:var(--plum);
+  }
+  .step-label{
+    font-family:'Space Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--plum-soft);
+    margin-bottom:6px;
+  }
+  .quiz-question{
+    font-size:1.4rem;
+    max-width:26ch;
+  }
+  .choices{
+    display:grid;
+    gap:12px;
+    margin-top:30px;
+  }
+  .choice{
+    text-align:left;
+    background:transparent;
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:16px 20px;
+    font-family:'Work Sans', sans-serif;
+    font-size:1rem;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    transition:border-color 0.15s ease, background 0.15s ease;
+  }
+  .choice:hover{ border-color:var(--berry); background:rgba(194,77,110,0.05); }
+  .choice .dot{
+    width:9px; height:9px; border-radius:50%;
+    border:1.4px solid var(--plum-soft);
+    flex-shrink:0;
+  }
+  .quiz-nav{
+    display:flex;
+    justify-content:space-between;
+    margin-top:34px;
+  }
+  .quiz-nav .back{
+    background:none; border:none;
+    font-family:'Space Mono', monospace;
+    font-size:0.78rem;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--plum-soft);
+    cursor:pointer;
+  }
+  .quiz-nav .back:disabled{ opacity:0.35; cursor:not-allowed; }
+
+  /* result screen */
+  #result-view{ display:none; }
+  .result-tag{
+    font-family:'Space Mono', monospace;
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--sage);
+  }
+  .result-title{ font-size:1.7rem; margin:12px 0 16px; }
+  .result-body{ color:var(--plum-soft); margin-bottom:26px; }
+  .result-panel{
+    background:var(--plum);
+    color:var(--cream);
+    border-radius:2px;
+    padding:28px;
+    margin-top:8px;
+  }
+  .result-panel h3{ color:var(--cream); font-size:1.15rem; margin-bottom:8px; }
+  .result-panel p{ color:rgba(251,246,239,0.75); margin-bottom:22px; font-size:0.94rem; }
+  .result-panel .btn-primary{ background:var(--gold); color:var(--plum); text-decoration:none; }
+  .form-note{ font-family:'Space Mono', monospace; font-size:0.68rem; color:rgba(251,246,239,0.55); margin-top:12px; }
+
+  /* ---------- SOCIAL PROOF ---------- */
+  #proof-view{ display:none; }
+  .proof-tag{
+    font-family:'Space Mono', monospace;
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--berry);
+  }
+  .proof-title{ font-size:1.4rem; margin:12px 0 22px; max-width:26ch; }
+  .proof-feed{
+    display:grid;
+    gap:10px;
+    margin-bottom:26px;
+  }
+  .proof-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:13px 16px;
+  }
+  .proof-row .who{ font-size:0.92rem; }
+  .proof-row .who small{ display:block; font-family:'Space Mono', monospace; font-size:0.66rem; color:var(--plum-soft); margin-top:2px; }
+  .proof-row .amount{ font-family:'Space Mono', monospace; font-size:0.88rem; }
+  .proof-badge{
+    font-family:'Space Mono', monospace;
+    font-size:0.66rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    background:rgba(124,140,86,0.18);
+    color:var(--sage);
+    padding:4px 9px;
+    border-radius:20px;
+    white-space:nowrap;
+  }
+  .proof-note{ color:var(--plum-soft); font-size:0.92rem; margin-bottom:24px; }
+  .proof-shot{
+    width:100%;
+    max-height:340px;
+    object-fit:cover;
+    object-position:top;
+    border:1px solid var(--line);
+    border-radius:4px;
+    box-shadow:0 14px 30px -18px rgba(61,42,61,0.35);
+    display:block;
+    margin-bottom:22px;
+  }
+  .proof-video-wrap{
+    position:relative;
+    width:100%;
+    border-radius:4px;
+    overflow:hidden;
+    box-shadow:0 14px 30px -18px rgba(61,42,61,0.35);
+    margin-bottom:22px;
+    background:var(--plum);
+  }
+
+  footer{
+    padding:20px 24px 28px;
+    text-align:center;
+  }
+  .footer-note{ font-family:'Space Mono', monospace; font-size:0.65rem; color:var(--plum-soft); max-width:52ch; margin:0 auto; }
+
+  @media (max-width:600px){
+    .quiz-shell{ padding:30px 22px; }
+    .quiz-head{ flex-direction:column; align-items:flex-start; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="eyebrow">Ciclo Fértil</div>
+</div>
+
+<main>
+  <div id="quiz-view" class="quiz-shell">
+    <div class="quiz-head">
+      <div>
+        <div class="step-label" id="step-label">Pergunta 1 de 6</div>
+        <h2 class="quiz-question" id="q-text"></h2>
+      </div>
+      <svg class="progress-ring" viewBox="0 0 66 66">
+        <circle class="track" cx="33" cy="33" r="28"/>
+        <circle class="fill" id="ring-fill" cx="33" cy="33" r="28" stroke-dasharray="176" stroke-dashoffset="176"/>
+        <text x="33" y="38" text-anchor="middle" class="progress-num" id="ring-num">1/6</text>
+      </svg>
+    </div>
+
+    <div class="choices" id="choices"></div>
+
+    <div class="quiz-nav">
+      <button class="back" id="back-btn" onclick="goBack()">← Voltar</button>
+      <span></span>
+    </div>
+  </div>
+
+  <div id="proof-view" class="quiz-shell">
+    <div class="proof-tag">Prova social</div>
+    <h2 class="proof-title">Você não está sozinha nessa — outras mulheres já garantiram o guia.</h2>
+    <div class="proof-video-wrap">
+      <iframe
+        src="https://play.tynk.ai/p/a42cddc9-4e17-445f-8f1f-c9494843ce35"
+        style="width: 100%; aspect-ratio: 16/9; border: 0; display: block;"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+    </div>
+    <p class="proof-note">Assista rapidinho antes de continuar.</p>
+    <button class="btn btn-primary" onclick="continueFromProof()">Continuar meu quiz →</button>
+  </div>
+
+  <div id="result-view" class="quiz-shell">
+    <div class="result-tag" id="result-tag">Seu perfil</div>
+    <h2 class="result-title" id="result-title"></h2>
+    <p class="result-body" id="result-body"></p>
+
+    <div class="result-panel">
+      <h3>Guia Ciclo Fértil — Nutrição para a Fertilidade Feminina</h3>
+      <p>Um plano alimentar por fase do ciclo, lista de nutrientes-chave e cardápios prontos — por apenas R$ 27,00.</p>
+      <a class="btn btn-primary" href="http://lastlink.com/" target="_blank" rel="noopener">
+        Quero meu guia por R$ 27,00 →
+      </a>
+      <div class="form-note">Acesso imediato após a confirmação do pagamento.</div>
+    </div>
+
+    <div style="margin-top:20px; text-align:center;">
+      <button class="btn btn-ghost" onclick="restartQuiz()">Refazer o quiz</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-note">Conteúdo educativo, não substitui acompanhamento médico ou nutricional individualizado.</div>
+</footer>
+
+<script>
+  const questions = [
+    {
+      key: "idade",
+      text: "Qual é a sua faixa etária?",
+      options: ["Até 25 anos", "26 a 30 anos", "31 a 35 anos", "36 anos ou mais"]
+    },
+    {
+      key: "ciclo",
+      text: "Como você descreveria seu ciclo menstrual hoje?",
+      options: ["Regular e previsível", "Irregular ou imprevisível", "Uso anticoncepcional, não sei dizer", "Não tenho certeza"]
+    },
+    {
+      key: "tempo",
+      text: "Há quanto tempo você está de olho na fertilidade?",
+      options: ["Ainda estou me organizando", "Menos de 6 meses tentando", "Entre 6 meses e 1 ano", "Mais de 1 ano tentando"]
+    },
+    {
+      key: "alimentacao",
+      text: "Como está sua alimentação atualmente?",
+      options: ["Bem equilibrada, na maioria dos dias", "Irregular, sem muita rotina", "Bastante processada", "Sigo uma dieta restritiva"]
+    },
+    {
+      key: "conhecimento",
+      text: "O quanto você já conhece sobre nutrientes-chave para fertilidade?",
+      options: ["Conheço bem e já aplico", "Já ouvi falar, mas não sei aplicar", "Nunca me aprofundei no assunto"]
+    },
+    {
+      key: "preocupacao",
+      text: "O que mais pesa na sua cabeça agora?",
+      options: ["A questão da idade biológica", "Hormônios que parecem desregulados", "Falta de informação clara", "A ansiedade com todo o processo"]
+    }
+  ];
+
+  const profiles = {
+    "A questão da idade biológica": {
+      tag: "Perfil: Reserva & Tempo",
+      title: "Seu foco é dar suporte ao corpo agora, sem perder tempo com informação genérica.",
+      body: "Faz sentido priorizar nutrientes com respaldo para qualidade ovocitária e ambiente hormonal, com um plano direto ao ponto — sem enrolação, sem dietas da moda."
+    },
+    "Hormônios que parecem desregulados": {
+      tag: "Perfil: Equilíbrio Hormonal",
+      title: "O caminho para você passa por entender o ciclo antes de mudar o prato.",
+      body: "Um plano por fase do ciclo ajuda a identificar o que o corpo pede em cada momento — em vez de uma dieta única que ignora as suas oscilações hormonais."
+    },
+    "Falta de informação clara": {
+      tag: "Perfil: Base Nutricional",
+      title: "Você não precisa de mais artigos soltos — precisa de um plano organizado.",
+      body: "Um guia estruturado, com o porquê de cada recomendação, é o que transforma informação dispersa em hábito real."
+    },
+    "A ansiedade com todo o processo": {
+      tag: "Perfil: Corpo & Mente",
+      title: "Cuidar da alimentação também é uma forma de recuperar sensação de controle.",
+      body: "Um plano simples e previsível — com cardápios prontos — tira o peso de decidir tudo sozinha, dia após dia."
+    }
+  };
+
+  let current = 0;
+  const answers = {};
+
+  function renderQuestion(){
+    const q = questions[current];
+    document.getElementById('step-label').textContent = `Pergunta ${current+1} de ${questions.length}`;
+    document.getElementById('q-text').textContent = q.text;
+    document.getElementById('ring-num').textContent = `${current+1}/${questions.length}`;
+    document.getElementById('back-btn').disabled = current === 0;
+
+    const ring = document.getElementById('ring-fill');
+    const circumference = 176;
+    const filled = circumference - (circumference * (current / questions.length));
+    ring.style.strokeDashoffset = filled;
+
+    const box = document.getElementById('choices');
+    box.innerHTML = "";
+    q.options.forEach(opt => {
+      const b = document.createElement('button');
+      b.className = 'choice';
+      b.innerHTML = `<span class="dot"></span>${opt}`;
+      b.onclick = () => selectAnswer(q.key, opt);
+      box.appendChild(b);
+    });
+  }
+
+  function selectAnswer(key, value){
+    answers[key] = value;
+    if(current < questions.length - 1){
+      current++;
+      if(current === 3){
+        showProof();
+      } else {
+        renderQuestion();
+      }
+    } else {
+      showResult();
+    }
+  }
+
+  function showProof(){
+    document.getElementById('quiz-view').style.display = 'none';
+    document.getElementById('proof-view').style.display = 'block';
+  }
+
+  function continueFromProof(){
+    document.getElementById('proof-view').style.display = 'none';
+    document.getElementById('quiz-view').style.display = 'block';
+    renderQuestion();
+  }
+
+  function goBack(){
+    if(current > 0){
+      current--;
+      renderQuestion();
+    }
+  }
+
+  function showResult(){
+    document.getElementById('ring-fill').style.strokeDashoffset = 0;
+    const profile = profiles[answers.preocupacao] || profiles["Falta de informação clara"];
+    document.getElementById('result-tag').textContent = profile.tag;
+    document.getElementById('result-title').textContent = profile.title;
+    document.getElementById('result-body').textContent = profile.body;
+    document.getElementById('quiz-view').style.display = 'none';
+    document.getElementById('result-view').style.display = 'block';
+  }
+
+  function restartQuiz(){
+    current = 0;
+    for(const k in answers) delete answers[k];
+    document.getElementById('result-view').style.display = 'none';
+    document.getElementById('proof-view').style.display = 'none';
+    document.getElementById('quiz-view').style.display = 'block';
+    renderQuestion();
+  }
+
+  renderQuestion();
+</script>
+
+</body>
+</html>
