@@ -10,23 +10,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
-<!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1651861646939725');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1651861646939725&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src="https://api.nutrigabiquaresma.shop/1zjylscujte.js?"+i;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','cvtqvo=DBBXMjc%2BQTI2JD0lWiQ9XxNJWFtSVQgXWBofAREaCxgHHRsAAgEJCggVRAYLHBw%3D');</script>
+<!-- End Google Tag Manager -->
 
 <style>
 
@@ -787,9 +773,6 @@ h1, h2, h3, .serif{ font-family: var(--serif); font-weight: 500; color: var(--mo
 const WHATSAPP_NUMBER = "5531987224279";
 const WHATSAPP_MESSAGE = "Oi, nutri Gabi Quaresma! Acabei de preencher meu pré-atendimento pelo seu site e gostaria de dar continuidade ao meu atendimento.";
 
-// ID do Meta Pixel (mesmo número usado no <head>)
-const META_PIXEL_ID = "1651861646939725";
-
 // Cole aqui a URL do Webhook do Make.com (veja instruções da Gabrielle/Claude).
 // Enquanto estiver vazia, o site funciona normalmente, só não envia para o Notion.
 const NOTION_WEBHOOK_URL = "";
@@ -901,37 +884,6 @@ function saveAnswers(){
 }
 
 /* ===================================================================
-   META PIXEL — ADVANCED MATCHING + EVENTO LEAD
-   =================================================================== */
-function getAdvancedMatching(){
-  let raw = {};
-  try{ raw = JSON.parse(sessionStorage.getItem('preAtendimento') || '{}'); } catch(err){}
-
-  const match = {};
-
-  if(raw.nomeCompleto){
-    const partes = raw.nomeCompleto.trim().toLowerCase().split(/\s+/);
-    if(partes[0]) match.fn = partes[0];
-    if(partes.length > 1) match.ln = partes[partes.length - 1];
-  }
-
-  if(raw.whatsapp){
-    let telefone = raw.whatsapp.replace(/\D/g, '');
-    if(telefone && !telefone.startsWith('55')) telefone = '55' + telefone;
-    if(telefone) match.ph = telefone;
-  }
-
-  return match;
-}
-
-function trackLead(){
-  if(typeof fbq !== 'function') return;
-  // reenvia o init com os dados de Advanced Matching agora que já temos nome/whatsapp
-  fbq('init', META_PIXEL_ID, getAdvancedMatching());
-  fbq('track', 'Lead');
-}
-
-/* ===================================================================
    ENVIO PARA O NOTION (via Make.com)
    =================================================================== */
 function buildNotionPayload(){
@@ -991,7 +943,6 @@ function sendToNotion(){
    =================================================================== */
 function finishForm(){
   saveAnswers();
-  trackLead();
   const url = WHATSAPP_NUMBER && WHATSAPP_NUMBER !== "SEU_NUMERO_AQUI"
     ? 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(WHATSAPP_MESSAGE)
     : '#';
